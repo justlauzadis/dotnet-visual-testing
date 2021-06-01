@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="NUnit" Version="3.12.0" />
+        <PackageReference Include="NUnit3TestAdapter" Version="3.16.1" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
+        <PackageReference Include="PlaywrightSharp" Version="0.192.0" />
+        <PackageReference Include="Selenium.WebDriver" Version="4.0.0-beta2" />
+        <PackageReference Include="Selenium.WebDriver.ChromeDriver" Version="90.0.4430.2400" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\DotNetVisualTesting.Playwright\DotNetVisualTesting.Playwright.csproj" />
+      <ProjectReference Include="..\DotNetVisualTesting.Selenium.ChromeDriver\DotNetVisualTesting.Selenium.ChromeDriver.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Visual\Diff" />
+    </ItemGroup>
+
+</Project>

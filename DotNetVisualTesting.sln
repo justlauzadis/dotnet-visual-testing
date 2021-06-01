@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetVisualTesting.Core", "DotNetVisualTesting.Core\DotNetVisualTesting.Core.csproj", "{980AB10F-307C-4D26-AFBB-F865CD4555B4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetVisualTesting.Tests", "DotNetVisualTesting.Tests\DotNetVisualTesting.Tests.csproj", "{2FB18488-24B0-4D8F-AC06-2CC8FA6CB75F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetVisualTesting.Selenium.ChromeDriver", "DotNetVisualTesting.Selenium.ChromeDriver\DotNetVisualTesting.Selenium.ChromeDriver.csproj", "{F2928943-2577-4525-8CF6-FB4396387A1F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetVisualTesting.Playwright", "DotNetVisualTesting.Playwright\DotNetVisualTesting.Playwright.csproj", "{86CF6F38-79D0-41E7-9E01-AA0F8F057804}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{980AB10F-307C-4D26-AFBB-F865CD4555B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{980AB10F-307C-4D26-AFBB-F865CD4555B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{980AB10F-307C-4D26-AFBB-F865CD4555B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{980AB10F-307C-4D26-AFBB-F865CD4555B4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2FB18488-24B0-4D8F-AC06-2CC8FA6CB75F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2FB18488-24B0-4D8F-AC06-2CC8FA6CB75F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2FB18488-24B0-4D8F-AC06-2CC8FA6CB75F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2FB18488-24B0-4D8F-AC06-2CC8FA6CB75F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F2928943-2577-4525-8CF6-FB4396387A1F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2928943-2577-4525-8CF6-FB4396387A1F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F2928943-2577-4525-8CF6-FB4396387A1F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F2928943-2577-4525-8CF6-FB4396387A1F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{86CF6F38-79D0-41E7-9E01-AA0F8F057804}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{86CF6F38-79D0-41E7-9E01-AA0F8F057804}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{86CF6F38-79D0-41E7-9E01-AA0F8F057804}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{86CF6F38-79D0-41E7-9E01-AA0F8F057804}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
