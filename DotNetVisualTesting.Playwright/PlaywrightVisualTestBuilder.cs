@@ -2,7 +2,7 @@
 using System.Drawing;
 using System.IO;
 using DotNetVisualTesting.Core;
-using PlaywrightSharp;
+using Microsoft.Playwright;
 
 namespace DotNetVisualTesting.Playwright
 {
@@ -11,12 +11,15 @@ namespace DotNetVisualTesting.Playwright
         public PlaywrightVisualTestBuilder(IPage page, string name) :
             base(name,
                 () => new Bitmap(new MemoryStream(page.ScreenshotAsync().Result)),
-                () => new Bitmap(new MemoryStream(page.ScreenshotAsync(true).Result)))
+                () => new Bitmap(new MemoryStream(page.ScreenshotAsync(new PageScreenshotOptions
+                {
+                    FullPage = true
+                }).Result)))
         {}
 
         public PlaywrightVisualTestBuilder SetWebElement(IElementHandle element)
         {
-            var rect = element.GetBoundingBoxAsync().Result;
+            var rect = element.BoundingBoxAsync().Result;
             SetViewportRectangle(new Rectangle((int) rect.X, (int) rect.Y, (int) rect.Width, (int) rect.Height));
             return this;
         }
@@ -26,7 +29,7 @@ namespace DotNetVisualTesting.Playwright
             var ignoredRectangles = new List<(Rectangle, Color)>();
             foreach (var (element, color) in ignoredElements)
             {
-                var rect = element.GetBoundingBoxAsync().Result;
+                var rect = element.BoundingBoxAsync().Result;
                 ignoredRectangles.Add((new Rectangle((int) rect.X, (int) rect.Y, (int) rect.Width, (int) rect.Height), color));
             }
 

@@ -5,8 +5,7 @@ using System.IO;
 using System.Linq;
 using DotNetVisualTesting.Playwright;
 using NUnit.Framework;
-using PlaywrightSharp;
-using PlaywrightSharp.Chromium;
+using Microsoft.Playwright;
 
 namespace DotNetVisualTesting.Tests.Tests
 {
@@ -18,7 +17,7 @@ namespace DotNetVisualTesting.Tests.Tests
         private const string BrowserName = "chrome";
 
         private IPlaywright _playwright;
-        private IChromiumBrowser _browser;
+        private IBrowser _browser;
         
         private sealed class TestScope : IDisposable {
             public IPage Page { get; }
@@ -36,8 +35,11 @@ namespace DotNetVisualTesting.Tests.Tests
         [OneTimeSetUp]
         public void OneTimeSetup()
         {
-            _playwright = PlaywrightSharp.Playwright.CreateAsync().Result;
-            _browser = _playwright.Chromium.LaunchAsync(true).Result;
+            _playwright = Microsoft.Playwright.Playwright.CreateAsync().Result;
+            _browser = _playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
+            {
+                Headless = true
+            }).Result;
         }
 
         [OneTimeTearDown]
@@ -57,7 +59,7 @@ namespace DotNetVisualTesting.Tests.Tests
             
             Assert.False(File.Exists(baselineImagePath), "Unexpected baseline image found.");
 
-            scope.Page.GoToAsync(PathToTestPage).Wait();
+            scope.Page.GotoAsync(PathToTestPage).Wait();
             VisualTestHelper.InitTest(scope.Page, imageName).Test();
             
             Assert.True(File.Exists(baselineImagePath), "Expected baseline image not created.");
@@ -78,7 +80,7 @@ namespace DotNetVisualTesting.Tests.Tests
             
             Assert.False(File.Exists(baselineImagePath), "Unexpected baseline image found.");
             
-                scope.Page.GoToAsync(PathToTestPage).Wait();
+                scope.Page.GotoAsync(PathToTestPage).Wait();
             VisualTestHelper.InitTest(scope.Page, imageName)
                 .UseFullPageScreenshot()
                 .Test();
@@ -101,7 +103,7 @@ namespace DotNetVisualTesting.Tests.Tests
             
             Assert.False(File.Exists(baselineImagePath), "Unexpected baseline image found.");
             
-            scope.Page.GoToAsync(PathToTestPage).Wait();
+            scope.Page.GotoAsync(PathToTestPage).Wait();
             var sectionElement = scope.Page.QuerySelectorAsync("xpath=.//div[contains(@class,'panel-default') and .//a[contains(.,'APDEX')]]").Result;
             VisualTestHelper.InitTest(scope.Page, imageName)
                 .SetWebElement(sectionElement)
@@ -126,7 +128,7 @@ namespace DotNetVisualTesting.Tests.Tests
             
             Assert.False(File.Exists(baselineImagePath), "Unexpected baseline image found.");
             
-            scope.Page.GoToAsync(PathToTestPage).Wait();
+            scope.Page.GotoAsync(PathToTestPage).Wait();
             var sectionElement1 = scope.Page.QuerySelectorAsync("xpath=.//div[contains(@class,'panel-default') and .//a[contains(.,'APDEX')]]").Result;
             var sectionElement2 = scope.Page.QuerySelectorAsync("xpath=.//div[contains(@class,'panel-default') and .//p[contains(.,'Requests Summary')]]").Result;
             VisualTestHelper.InitTest(scope.Page, imageName)
@@ -155,7 +157,7 @@ namespace DotNetVisualTesting.Tests.Tests
             Assert.AreEqual(0, GetDiffImageFiles(imageName).Count, "Unable to delete images.");
             Assert.True(File.Exists(GetBaselineImagePath(imageName)));
 
-            scope.Page.GoToAsync(PathToTestPage).Wait();
+            scope.Page.GotoAsync(PathToTestPage).Wait();
 
             var visualTestThrowsException = false;
             try
@@ -185,7 +187,7 @@ namespace DotNetVisualTesting.Tests.Tests
             Assert.AreEqual(0, GetDiffImageFiles(imageName).Count, "Unable to delete images.");
             Assert.True(File.Exists(GetBaselineImagePath(imageName)));
 
-            scope.Page.GoToAsync(PathToTestPage).Wait();
+            scope.Page.GotoAsync(PathToTestPage).Wait();
 
             var visualTestThrowsException = false;
             try
@@ -215,7 +217,7 @@ namespace DotNetVisualTesting.Tests.Tests
             Assert.AreEqual(0, GetDiffImageFiles(imageName).Count, "Unable to delete images.");
             Assert.True(File.Exists(GetBaselineImagePath(imageName)));
             
-            scope.Page.GoToAsync(PathToTestPage).Wait();
+            scope.Page.GotoAsync(PathToTestPage).Wait();
             VisualTestHelper.InitTest(scope.Page, imageName)
                 .UseFullPageScreenshot()
                 .Test();
@@ -233,7 +235,7 @@ namespace DotNetVisualTesting.Tests.Tests
             Assert.AreEqual(0, GetDiffImageFiles(imageName).Count, "Unable to delete images.");
             Assert.True(File.Exists(GetBaselineImagePath(imageName)));
             
-            scope.Page.GoToAsync(PathToTestPage).Wait();
+            scope.Page.GotoAsync(PathToTestPage).Wait();
             VisualTestHelper.InitTest(scope.Page, imageName)
                 .SetTolerance(0.08)
                 .Test();
@@ -251,7 +253,7 @@ namespace DotNetVisualTesting.Tests.Tests
             Assert.AreEqual(0, GetDiffImageFiles(imageName).Count, "Unable to delete images.");
             Assert.True(File.Exists(GetBaselineImagePath(imageName)));
             
-            scope.Page.GoToAsync(PathToTestPage).Wait();
+            scope.Page.GotoAsync(PathToTestPage).Wait();
             VisualTestHelper.InitTest(scope.Page, imageName)
                 .SetAbsoluteTolerance(152090)
                 .Test();

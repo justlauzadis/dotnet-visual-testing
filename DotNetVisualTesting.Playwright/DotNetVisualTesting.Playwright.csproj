@@ -9,7 +9,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="PlaywrightSharp" Version="0.192.0" />
+      <PackageReference Include="Microsoft.Playwright" Version="1.18.1" />
     </ItemGroup>
 
 </Project>

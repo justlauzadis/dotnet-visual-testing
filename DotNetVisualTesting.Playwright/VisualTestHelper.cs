@@ -1,4 +1,4 @@
-﻿using PlaywrightSharp;
+﻿using Microsoft.Playwright;
 
 namespace DotNetVisualTesting.Playwright
 {
