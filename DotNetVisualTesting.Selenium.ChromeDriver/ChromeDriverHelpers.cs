@@ -12,9 +12,9 @@ namespace DotNetVisualTesting.Selenium.ChromeDriver
             metrics["height"] = driver.ExecuteScript("return Math.max(window.innerHeight,document.body.scrollHeight,document.documentElement.scrollHeight)");
             metrics["deviceScaleFactor"] = double.Parse(driver.ExecuteScript("return window.devicePixelRatio").ToString());
             metrics["mobile"] = driver.ExecuteScript("return typeof window.orientation !== 'undefined'");
-            driver.ExecuteChromeCommand("Emulation.setDeviceMetricsOverride", metrics);
+            driver.ExecuteCdpCommand("Emulation.setDeviceMetricsOverride", metrics);
             var screenshot = driver.GetScreenshot();
-            driver.ExecuteChromeCommand("Emulation.clearDeviceMetricsOverride", new Dictionary<string, object>());
+            driver.ExecuteCdpCommand("Emulation.clearDeviceMetricsOverride", new Dictionary<string, object>());
             return screenshot;
         }
     }

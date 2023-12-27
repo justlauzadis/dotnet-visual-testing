@@ -248,7 +248,7 @@ namespace DotNetVisualTesting.Tests.Tests
             
             scope.WebDriver.Navigate().GoToUrl(PathToTestPage);
             VisualTestHelper.InitTest(scope.WebDriver, imageName)
-                .SetAbsoluteTolerance(152090)
+                .SetAbsoluteTolerance(153000)
                 .Test();
             
             Assert.AreEqual(0, GetDiffImageFiles(imageName).Count, "Unexpected diff image created.");

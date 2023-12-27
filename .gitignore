@@ -255,9 +255,6 @@ __pycache__/
 obj/
 bin/
 
-# Bower
-bower_components/
-
 #Ignore visual studio code extensions.
 .vscode/
 **/.tscache/
