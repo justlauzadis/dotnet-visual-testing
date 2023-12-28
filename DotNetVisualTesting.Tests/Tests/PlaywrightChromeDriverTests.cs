@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using DotNetVisualTesting.Playwright;
 using NUnit.Framework;
 using Microsoft.Playwright;
+using SkiaSharp;
 
 namespace DotNetVisualTesting.Tests.Tests
 {
@@ -132,10 +132,10 @@ namespace DotNetVisualTesting.Tests.Tests
             var sectionElement1 = scope.Page.QuerySelectorAsync("xpath=.//div[contains(@class,'panel-default') and .//a[contains(.,'APDEX')]]").Result;
             var sectionElement2 = scope.Page.QuerySelectorAsync("xpath=.//div[contains(@class,'panel-default') and .//p[contains(.,'Requests Summary')]]").Result;
             VisualTestHelper.InitTest(scope.Page, imageName)
-                .SetIgnoredElements(new List<(IElementHandle, Color)>
+                .SetIgnoredElements(new List<(IElementHandle, SKColor)>
                 {
-                    (sectionElement1, Color.Black),
-                    (sectionElement2, Color.Green)
+                    (sectionElement1, SKColors.Black),
+                    (sectionElement2, SKColors.Green)
                 })
                 .UseFullPageScreenshot()
                 .Test();

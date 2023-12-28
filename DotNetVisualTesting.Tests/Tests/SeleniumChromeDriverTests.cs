@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using DotNetVisualTesting.Selenium.ChromeDriver;
 using NUnit.Framework;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using SkiaSharp;
 
 namespace DotNetVisualTesting.Tests.Tests
 {
@@ -56,10 +56,7 @@ namespace DotNetVisualTesting.Tests.Tests
             VisualTestHelper.InitTest(scope.WebDriver, imageName).Test();
             
             Assert.True(File.Exists(baselineImagePath), "Expected baseline image not created.");
-            Assert.AreEqual(
-                File.OpenRead(GetExpectedImagePath(imageName)),
-                File.OpenRead(GetBaselineImagePath(imageName)),
-                "Created image not equal to expected image.");
+            AssertBitmapsAreEqual(SKBitmap.Decode(GetExpectedImagePath(imageName)), SKBitmap.Decode(GetBaselineImagePath(imageName)));
         }
         
         [Test]
@@ -79,10 +76,7 @@ namespace DotNetVisualTesting.Tests.Tests
                 .Test();
             
             Assert.True(File.Exists(baselineImagePath), "Expected baseline image not created.");
-            Assert.AreEqual(
-                File.OpenRead(GetExpectedImagePath(imageName)),
-                File.OpenRead(GetBaselineImagePath(imageName)),
-                "Created image not equal to expected image.");
+            AssertBitmapsAreEqual(SKBitmap.Decode(GetExpectedImagePath(imageName)), SKBitmap.Decode(GetBaselineImagePath(imageName)));
         }
         
         [Test]
@@ -104,10 +98,7 @@ namespace DotNetVisualTesting.Tests.Tests
                 .Test();
             
             Assert.True(File.Exists(baselineImagePath), "Expected baseline image not created.");
-            Assert.AreEqual(
-                File.OpenRead(GetExpectedImagePath(imageName)),
-                File.OpenRead(GetBaselineImagePath(imageName)),
-                "Created image not equal to expected image.");
+            AssertBitmapsAreEqual(SKBitmap.Decode(GetExpectedImagePath(imageName)), SKBitmap.Decode(GetBaselineImagePath(imageName)));
         }
         
         [Test]
@@ -125,19 +116,16 @@ namespace DotNetVisualTesting.Tests.Tests
             var sectionElement1 = scope.WebDriver.FindElement(By.XPath(".//div[contains(@class,'panel-default') and .//a[contains(.,'APDEX')]]"));
             var sectionElement2 = scope.WebDriver.FindElement(By.XPath(".//div[contains(@class,'panel-default') and .//p[contains(.,'Requests Summary')]]"));
             VisualTestHelper.InitTest(scope.WebDriver, imageName)
-                .SetIgnoredElements(new List<(IWebElement, Color)>
+                .SetIgnoredElements(new List<(IWebElement, SKColor)>
                 {
-                    (sectionElement1, Color.Black),
-                    (sectionElement2, Color.Green)
+                    (sectionElement1, SKColors.Black),
+                    (sectionElement2, SKColors.Green)
                 })
                 .UseFullPageScreenshot()
                 .Test();
             
             Assert.True(File.Exists(baselineImagePath), "Expected baseline image not created.");
-            Assert.AreEqual(
-                File.OpenRead(GetExpectedImagePath(imageName)),
-                File.OpenRead(GetBaselineImagePath(imageName)),
-                "Created image not equal to expected image.");
+            AssertBitmapsAreEqual(SKBitmap.Decode(GetExpectedImagePath(imageName)), SKBitmap.Decode(GetBaselineImagePath(imageName)));
         }
 
         [Test]
@@ -164,10 +152,9 @@ namespace DotNetVisualTesting.Tests.Tests
             
             Assert.IsTrue(visualTestThrowsException, "Visual test has not failed.");
             Assert.AreEqual(1, GetDiffImageFiles(imageName).Count, "Expected diff image not created.");
-            Assert.AreEqual(
-                File.OpenRead(GetExpectedImagePath(imageName)),
-                File.OpenRead(GetDiffImagePath(Path.GetFileNameWithoutExtension(GetDiffImageFiles(imageName).FirstOrDefault()?.Name))),
-                "Created image not equal to expected image.");
+            AssertBitmapsAreEqual(
+                SKBitmap.Decode(GetExpectedImagePath(imageName)), 
+                SKBitmap.Decode(GetDiffImagePath(Path.GetFileNameWithoutExtension(GetDiffImageFiles(imageName).FirstOrDefault()?.Name))));
         }
         
         [Test]
@@ -194,10 +181,9 @@ namespace DotNetVisualTesting.Tests.Tests
             
             Assert.IsTrue(visualTestThrowsException, "Visual test has not failed.");
             Assert.AreEqual(1, GetDiffImageFiles(imageName).Count, "Expected diff image not created.");
-            Assert.AreEqual(
-                File.OpenRead(GetExpectedImagePath(imageName)),
-                File.OpenRead(GetDiffImagePath(Path.GetFileNameWithoutExtension(GetDiffImageFiles(imageName).FirstOrDefault()?.Name))),
-                "Created image not equal to expected image.");
+            AssertBitmapsAreEqual(
+                SKBitmap.Decode(GetExpectedImagePath(imageName)),
+                SKBitmap.Decode(GetDiffImagePath(Path.GetFileNameWithoutExtension(GetDiffImageFiles(imageName).FirstOrDefault()?.Name))));
         }
 
         [Test]

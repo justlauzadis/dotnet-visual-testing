@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using DotNetVisualTesting.Core;
 using Microsoft.Playwright;
+using SkiaSharp;
 
 namespace DotNetVisualTesting.Playwright
 {
@@ -10,8 +10,8 @@ namespace DotNetVisualTesting.Playwright
     {
         public PlaywrightVisualTestBuilder(IPage page, string name) :
             base(name,
-                () => new Bitmap(new MemoryStream(page.ScreenshotAsync().Result)),
-                () => new Bitmap(new MemoryStream(page.ScreenshotAsync(new PageScreenshotOptions
+                () => SKBitmap.Decode(new MemoryStream(page.ScreenshotAsync().Result)),
+                () => SKBitmap.Decode(new MemoryStream(page.ScreenshotAsync(new PageScreenshotOptions
                 {
                     FullPage = true
                 }).Result)))
@@ -20,17 +20,17 @@ namespace DotNetVisualTesting.Playwright
         public PlaywrightVisualTestBuilder SetWebElement(IElementHandle element)
         {
             var rect = element.BoundingBoxAsync().Result;
-            SetViewportRectangle(new Rectangle((int) rect.X, (int) rect.Y, (int) rect.Width, (int) rect.Height));
+            SetViewportRectangle(new SKRectI((int)rect.X, (int)rect.Y, (int)(rect.X + rect.Width), (int)(rect.Y + rect.Height)));
             return this;
         }
 
-        public PlaywrightVisualTestBuilder SetIgnoredElements(List<(IElementHandle, Color)> ignoredElements)
+        public PlaywrightVisualTestBuilder SetIgnoredElements(List<(IElementHandle, SKColor)> ignoredElements)
         {
-            var ignoredRectangles = new List<(Rectangle, Color)>();
+            var ignoredRectangles = new List<(SKRectI, SKColor)>();
             foreach (var (element, color) in ignoredElements)
             {
                 var rect = element.BoundingBoxAsync().Result;
-                ignoredRectangles.Add((new Rectangle((int) rect.X, (int) rect.Y, (int) rect.Width, (int) rect.Height), color));
+                ignoredRectangles.Add((new SKRectI((int)rect.X, (int)rect.Y, (int)(rect.X + rect.Width), (int)(rect.Y + rect.Height)), color));
             }
 
             SetIgnoredRectangles(ignoredRectangles);

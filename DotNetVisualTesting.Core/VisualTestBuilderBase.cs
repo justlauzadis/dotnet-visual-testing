@@ -1,7 +1,6 @@
-﻿using System;
+﻿using SkiaSharp;
+using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -13,20 +12,20 @@ namespace DotNetVisualTesting.Core
         private readonly string _baselineDir;
         private readonly string _diffDir;
         private readonly string _name;
-        private readonly Func<Bitmap> _getViewportScreenshotFunc;
-        private readonly Func<Bitmap> _getFullSizeScreenshotFunc;
+        private readonly Func<SKBitmap> _getViewportScreenshotFunc;
+        private readonly Func<SKBitmap> _getFullSizeScreenshotFunc;
 
         private int _timeoutInSeconds = 10;
         private double _tolerance = 0.0001;
         private int _absoluteToleranceInPixels = 100;
-        private Rectangle? _scopeRectangle;
-        private List<(Rectangle, Color)> _ignoredRectangles;
+        private SKRectI? _scopeRectangle;
+        private List<(SKRectI, SKColor)> _ignoredRectangles;
         private bool _useFullPageScreenshot;
 
         private string BaselineImgPath => Path.Combine(_baselineDir, _name + ".png");
         private string DiffImgPath => Path.Combine(_diffDir, $"{_name}_{DateTime.Now:yyyyMMdd_HHmmss}.png");
 
-        protected VisualTestBuilderBase(string name, Func<Bitmap> getViewportScreenshotFunc, Func<Bitmap> getFullSizeScreenshotFunc)
+        protected VisualTestBuilderBase(string name, Func<SKBitmap> getViewportScreenshotFunc, Func<SKBitmap> getFullSizeScreenshotFunc)
         {
             _name = name;
             _getViewportScreenshotFunc = getViewportScreenshotFunc;
@@ -64,13 +63,13 @@ namespace DotNetVisualTesting.Core
             return this;
         }
 
-        protected VisualTestBuilderBase SetViewportRectangle(Rectangle scopeRectangle)
+        protected VisualTestBuilderBase SetViewportRectangle(SKRectI scopeRectangle)
         {
             _scopeRectangle = scopeRectangle;
             return this;
         }
 
-        protected VisualTestBuilderBase SetIgnoredRectangles(List<(Rectangle, Color)> ignoredElements)
+        protected VisualTestBuilderBase SetIgnoredRectangles(List<(SKRectI, SKColor)> ignoredElements)
         {
             _ignoredRectangles = ignoredElements;
             return this;
@@ -86,8 +85,8 @@ namespace DotNetVisualTesting.Core
         {
             var shouldSaveDiff = false;
             VisualTestResult visualTestResult = null;
-            Bitmap actualImg = null;
-            Bitmap baselineImg = null;
+            SKBitmap actualImg = null;
+            SKBitmap baselineImg = null;
             try
             {
                 WaitHelpers.WaitFor(() =>
@@ -97,7 +96,7 @@ namespace DotNetVisualTesting.Core
                         if (File.Exists(BaselineImgPath))
                         {
                             actualImg = GetAndProcessScreenshot();
-                            baselineImg = new Bitmap(BaselineImgPath);
+                            baselineImg = SKBitmap.Decode(BaselineImgPath);
                             visualTestResult = GetVisualTestResult(actualImg, baselineImg);
 
                             if ((double) visualTestResult.DiffPixelsCount / (baselineImg.Height * baselineImg.Width) > _tolerance && visualTestResult.DiffPixelsCount > _absoluteToleranceInPixels)
@@ -112,7 +111,7 @@ namespace DotNetVisualTesting.Core
 
                         Thread.Sleep(_timeoutInSeconds * 1000);
                         actualImg = GetAndProcessScreenshot();
-                        actualImg.Save(BaselineImgPath, ImageFormat.Png);
+                        actualImg.SaveAsPng(BaselineImgPath);
 
                         return (true, null);
                     }
@@ -129,7 +128,7 @@ namespace DotNetVisualTesting.Core
                 {
                     using var joinedImg1 = JoinImages(baselineImg, visualTestResult.DiffImage);
                     using var joinedImg2 = JoinImages(joinedImg1, actualImg);
-                    joinedImg2.Save(DiffImgPath, ImageFormat.Png);
+                    joinedImg2.SaveAsPng(DiffImgPath);
                 }
                 throw;
             }
@@ -141,7 +140,7 @@ namespace DotNetVisualTesting.Core
             }
         }
 
-        private Bitmap GetAndProcessScreenshot()
+        private SKBitmap GetAndProcessScreenshot()
         {
             var actualImg = _useFullPageScreenshot
                 ? _getFullSizeScreenshotFunc.Invoke()
@@ -156,8 +155,8 @@ namespace DotNetVisualTesting.Core
                     var ignoredElementWidth = ignoredElement.Size.Width;
                     var ignoredElementHeight = ignoredElement.Size.Height;
 
-                    var actualImgWidth = actualImg.Size.Width;
-                    var actualImgHeight = actualImg.Size.Height; 
+                    var actualImgWidth = actualImg.Width;
+                    var actualImgHeight = actualImg.Height; 
 
                     for (var x = ignoredElementLocationX;
                         x < ignoredElementLocationX + ignoredElementWidth;
@@ -180,7 +179,22 @@ namespace DotNetVisualTesting.Core
             {
                 try
                 {
-                    actualImg = actualImg.Clone((Rectangle) _scopeRectangle, actualImg.PixelFormat);
+                    var X = _scopeRectangle.Value.Location.X;
+                    var Y = _scopeRectangle.Value.Location.Y;
+                    var width = _scopeRectangle.Value.Width;
+                    var height = _scopeRectangle.Value.Height;
+                    using (SKBitmap croppedImg = new SKBitmap(width, height))
+                    {
+                        for (var i = 0; i < width; i++)
+                        {
+                            for (var j = 0; j < height; j++)
+                            {
+                                var pixel = actualImg.GetPixel(X + i, Y + j);
+                                croppedImg.SetPixel(i, j, pixel);
+                            }
+                        }
+                        actualImg = croppedImg.Copy();
+                    }
                 }
                 catch (ArgumentException e)
                 {
@@ -192,13 +206,12 @@ namespace DotNetVisualTesting.Core
             return actualImg;
         }
 
-        private static VisualTestResult GetVisualTestResult(Bitmap img1, Bitmap img2)
+        private static VisualTestResult GetVisualTestResult(SKBitmap img1, SKBitmap img2)
         {
-            var diffColor = Color.Red;
+            var diffColor = SKColors.Red;
 
-            var s1 = img1.Size;
-            var s2 = img2.Size;
-
+            var s1 = img1.Info.Size;
+            var s2 = img2.Info.Size;
             
             var verticalOffsets = s1.Height != s2.Height ? new List<int> {0, s1.Height - s2.Height} : new List<int>{0};
             var horizontalOffsets = s1.Width != s2.Width ? new List<int> {0, s1.Width - s2.Width} : new List<int>{0};
@@ -206,37 +219,37 @@ namespace DotNetVisualTesting.Core
             var maxImgWidth = s1.Width > s2.Width ? s1.Width : s2.Width;
             var maxImgHeight = s1.Height > s2.Height ? s1.Height : s2.Height;
 
-            var finalDiffImage = new Bitmap(maxImgWidth, maxImgHeight);
+            var finalDiffImage = new SKBitmap(maxImgWidth, maxImgHeight);
             var finalDiffPixelsCount = long.MaxValue;
 
             foreach (var verticalOffset in verticalOffsets)
             {
                 foreach (var horizontalOffset in horizontalOffsets)
                 {
-                    using var diffImg = new Bitmap(maxImgWidth, maxImgHeight);
+                    using var diffImg = new SKBitmap(maxImgWidth, maxImgHeight);
                     long diffPixelsCount = 0;
                     for (var y = 0; y < maxImgHeight; y++)
                     {
                         for (var x = 0; x < maxImgWidth; x++)
                         {
-                            try
+                            // pixel out of bounds
+                            if (x - horizontalOffset < 0 || x - horizontalOffset >= s2.Width || y - verticalOffset < 0 || y - verticalOffset >= s2.Height)
                             {
-                                var c1 = img1.GetPixel(x, y);
-                                var c2 = img2.GetPixel(x - horizontalOffset, y - verticalOffset);
-                        
-                                if (c1 == c2)
-                                {
-                                    var rgbAverage = (c1.R + c1.G + c1.B) / 3;
-                                    var grayscaleColor = Color.FromArgb(rgbAverage, rgbAverage, rgbAverage);
-                                    diffImg.SetPixel(x, y, grayscaleColor);
-                                }
-                                else
-                                {
-                                    diffImg.SetPixel(x, y, diffColor);
-                                    diffPixelsCount++;
-                                }
+                                diffImg.SetPixel(x, y, diffColor);
+                                diffPixelsCount++;
+                                continue;
                             }
-                            catch (ArgumentOutOfRangeException)
+
+                            var c1 = img1.GetPixel(x, y);
+                            var c2 = img2.GetPixel(x - horizontalOffset, y - verticalOffset);
+                        
+                            if (c1 == c2)
+                            {
+                                var rgbAverage = (c1.Red + c1.Green + c1.Blue) / 3;
+                                var grayscaleColor = new SKColor((byte)rgbAverage, (byte)rgbAverage, (byte)rgbAverage);
+                                diffImg.SetPixel(x, y, grayscaleColor);
+                            }
+                            else
                             {
                                 diffImg.SetPixel(x, y, diffColor);
                                 diffPixelsCount++;
@@ -246,7 +259,7 @@ namespace DotNetVisualTesting.Core
 
                     if (diffPixelsCount < finalDiffPixelsCount)
                     {
-                        finalDiffImage = (Bitmap) diffImg.Clone();
+                        finalDiffImage = diffImg.Copy();
                         finalDiffPixelsCount = diffPixelsCount;
                     }
                 }
@@ -255,10 +268,10 @@ namespace DotNetVisualTesting.Core
             return new VisualTestResult(finalDiffImage, finalDiffPixelsCount);
         }
 
-        private static Bitmap JoinImages(Bitmap img1, Bitmap img2)
+        private static SKBitmap JoinImages(SKBitmap img1, SKBitmap img2)
         {
-            var imgHeight = img1.Size.Height > img2.Size.Height ? img1.Size.Height : img2.Size.Height;
-            var newImg = new Bitmap(img1.Width + img2.Width, imgHeight);
+            var imgHeight = img1.Height > img2.Height ? img1.Height : img2.Height;
+            var newImg = new SKBitmap(img1.Width + img2.Width, imgHeight);
             for (var y = 0; y < imgHeight; y++)
             {
                 for (var x = 0; x < img1.Width; x++)
@@ -269,7 +282,7 @@ namespace DotNetVisualTesting.Core
                     }
                     catch (ArgumentOutOfRangeException)
                     {
-                        newImg.SetPixel(x, y, Color.White);
+                        newImg.SetPixel(x, y, SKColors.White);
                     }
                 }
 
@@ -281,7 +294,7 @@ namespace DotNetVisualTesting.Core
                     }
                     catch (ArgumentOutOfRangeException)
                     {
-                        newImg.SetPixel(img1.Width + x, y, Color.White);
+                        newImg.SetPixel(img1.Width + x, y, SKColors.White);
                     }
                 }
             }

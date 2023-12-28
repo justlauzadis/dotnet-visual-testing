@@ -1,14 +1,14 @@
-﻿using System;
-using System.Drawing;
+﻿using SkiaSharp;
+using System;
 
 namespace DotNetVisualTesting.Core
 {
     public class VisualTestResult : IDisposable
     {
-        public readonly Bitmap DiffImage;
+        public readonly SKBitmap DiffImage;
         public readonly long DiffPixelsCount;
 
-        public VisualTestResult(Bitmap diffImage, long diffPixelsCount)
+        public VisualTestResult(SKBitmap diffImage, long diffPixelsCount)
         {
             DiffImage = diffImage;
             DiffPixelsCount = diffPixelsCount;
