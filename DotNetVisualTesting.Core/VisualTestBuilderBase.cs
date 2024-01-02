@@ -232,7 +232,15 @@ namespace DotNetVisualTesting.Core
                     {
                         for (var x = 0; x < maxImgWidth; x++)
                         {
-                            // pixel out of bounds
+                            // c1 pixel out of bounds
+                            if (x < 0 || x >= s1.Width || y < 0 || y >= s1.Height)
+                            {
+                                diffImg.SetPixel(x, y, diffColor);
+                                diffPixelsCount++;
+                                continue;
+                            }
+
+                            // c2 pixel out of bounds
                             if (x - horizontalOffset < 0 || x - horizontalOffset >= s2.Width || y - verticalOffset < 0 || y - verticalOffset >= s2.Height)
                             {
                                 diffImg.SetPixel(x, y, diffColor);
@@ -276,26 +284,24 @@ namespace DotNetVisualTesting.Core
             {
                 for (var x = 0; x < img1.Width; x++)
                 {
-                    try
-                    {
-                        newImg.SetPixel(x, y, img1.GetPixel(x, y));
-                    }
-                    catch (ArgumentOutOfRangeException)
+                    if (x >= img1.Width || y >= img1.Height)
                     {
                         newImg.SetPixel(x, y, SKColors.White);
+                        continue;
                     }
+
+                    newImg.SetPixel(x, y, img1.GetPixel(x, y));
                 }
 
                 for (var x = 0; x < img2.Width; x++)
-                {
-                    try
-                    {
-                        newImg.SetPixel(img1.Width + x, y, img2.GetPixel(x, y));
-                    }
-                    catch (ArgumentOutOfRangeException)
+                {                    
+                    if (x >= img2.Width || y >= img2.Height)
                     {
                         newImg.SetPixel(img1.Width + x, y, SKColors.White);
+                        continue;
                     }
+
+                    newImg.SetPixel(img1.Width + x, y, img2.GetPixel(x, y));
                 }
             }
 

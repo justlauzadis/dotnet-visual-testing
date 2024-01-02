@@ -60,21 +60,26 @@ namespace DotNetVisualTesting.Tests.Tests
 
         protected void AssertBitmapsAreEqual(SKBitmap bitmap1, SKBitmap bitmap2)
         {
+            if (bitmap1 == null || bitmap2 == null)
+            {
+                throw new FileNotFoundException("One or both of the bitmaps are null.");
+            }
+
             var width1 = bitmap1.Width;
             var heigth1 = bitmap1.Height;
             var width2 = bitmap2.Width;
             var heigth2 = bitmap2.Height;
 
-            Assert.AreEqual(width1, width2, $"Widths are different. width1={width1}, width2={width2}.");
-            Assert.AreEqual(heigth1, heigth2, $"Heights are different. heigth1={heigth1}, heigth2={heigth2}.");
+            Assert.AreEqual(width1, width2, $"Widths are different.");
+            Assert.AreEqual(heigth1, heigth2, $"Heights are different.");
 
             for (var i = 0; i < width1; i++)
             {
                 for (var j = 0; j < heigth1; j++)
                 {
-                    Assert.AreEqual(bitmap1.GetPixel(i, j).Red, bitmap2.GetPixel(i, j).Red);
-                    Assert.AreEqual(bitmap1.GetPixel(i, j).Green, bitmap2.GetPixel(i, j).Green);
-                    Assert.AreEqual(bitmap1.GetPixel(i, j).Blue, bitmap2.GetPixel(i, j).Blue);
+                    Assert.AreEqual(bitmap1.GetPixel(i, j).Red, bitmap2.GetPixel(i, j).Red, "Colors are different (Red).");
+                    Assert.AreEqual(bitmap1.GetPixel(i, j).Green, bitmap2.GetPixel(i, j).Green, "Colors are different (Green).");
+                    Assert.AreEqual(bitmap1.GetPixel(i, j).Blue, bitmap2.GetPixel(i, j).Blue, "Colors are different (Blue).");
                 }
             }
         }
