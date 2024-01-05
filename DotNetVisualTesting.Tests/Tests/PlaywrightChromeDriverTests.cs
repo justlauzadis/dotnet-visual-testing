@@ -63,12 +63,9 @@ namespace DotNetVisualTesting.Tests.Tests
             VisualTestHelper.InitTest(scope.Page, imageName).Test();
             
             Assert.True(File.Exists(baselineImagePath), "Expected baseline image not created.");
-            Assert.AreEqual(
-                File.OpenRead(GetExpectedImagePath(imageName)),
-                File.OpenRead(GetBaselineImagePath(imageName)),
-                "Created image not equal to expected image.");
+            AssertBitmapsAreEqual(SKBitmap.Decode(GetExpectedImagePath(imageName)), SKBitmap.Decode(GetBaselineImagePath(imageName)));
         }
-        
+
         [Test]
         public void CreatesBaselineImageIfItDoesNotExist_FullPage()
         {
@@ -86,12 +83,9 @@ namespace DotNetVisualTesting.Tests.Tests
                 .Test();
             
             Assert.True(File.Exists(baselineImagePath), "Expected baseline image not created.");
-            Assert.AreEqual(
-                File.OpenRead(GetExpectedImagePath(imageName)),
-                File.OpenRead(GetBaselineImagePath(imageName)),
-                "Created image not equal to expected image.");
+            AssertBitmapsAreEqual(SKBitmap.Decode(GetExpectedImagePath(imageName)), SKBitmap.Decode(GetBaselineImagePath(imageName)));
         }
-        
+
         [Test]
         public void CreatesBaselineImageIfItDoesNotExist_ElementScope()
         {
@@ -111,12 +105,9 @@ namespace DotNetVisualTesting.Tests.Tests
                 .Test();
             
             Assert.True(File.Exists(baselineImagePath), "Expected baseline image not created.");
-            Assert.AreEqual(
-                File.OpenRead(GetExpectedImagePath(imageName)),
-                File.OpenRead(GetBaselineImagePath(imageName)),
-                "Created image not equal to expected image.");
+            AssertBitmapsAreEqual(SKBitmap.Decode(GetExpectedImagePath(imageName)), SKBitmap.Decode(GetBaselineImagePath(imageName)));
         }
-        
+
         [Test]
         public void CreatesBaselineImageIfItDoesNotExist_WithIgnoredElement()
         {
@@ -141,10 +132,7 @@ namespace DotNetVisualTesting.Tests.Tests
                 .Test();
             
             Assert.True(File.Exists(baselineImagePath), "Expected baseline image not created.");
-            Assert.AreEqual(
-                File.OpenRead(GetExpectedImagePath(imageName)),
-                File.OpenRead(GetBaselineImagePath(imageName)),
-                "Created image not equal to expected image.");
+            AssertBitmapsAreEqual(SKBitmap.Decode(GetExpectedImagePath(imageName)), SKBitmap.Decode(GetBaselineImagePath(imageName)));
         }
 
         [Test]
@@ -171,10 +159,9 @@ namespace DotNetVisualTesting.Tests.Tests
             
             Assert.IsTrue(visualTestThrowsException, "Visual test has not failed.");
             Assert.AreEqual(1, GetDiffImageFiles(imageName).Count, "Expected diff image not created.");
-            Assert.AreEqual(
-                File.OpenRead(GetExpectedImagePath(imageName)),
-                File.OpenRead(GetDiffImagePath(Path.GetFileNameWithoutExtension(GetDiffImageFiles(imageName).FirstOrDefault()?.Name))),
-                "Created image not equal to expected image.");
+            AssertBitmapsAreEqual(
+                SKBitmap.Decode(GetExpectedImagePath(imageName)),
+                SKBitmap.Decode(GetDiffImagePath(Path.GetFileNameWithoutExtension(GetDiffImageFiles(imageName).FirstOrDefault()?.Name))));
         }
         
         [Test]
@@ -201,10 +188,9 @@ namespace DotNetVisualTesting.Tests.Tests
             
             Assert.IsTrue(visualTestThrowsException, "Visual test has not failed.");
             Assert.AreEqual(1, GetDiffImageFiles(imageName).Count, "Expected diff image not created.");
-            Assert.AreEqual(
-                File.OpenRead(GetExpectedImagePath(imageName)),
-                File.OpenRead(GetDiffImagePath(Path.GetFileNameWithoutExtension(GetDiffImageFiles(imageName).FirstOrDefault()?.Name))),
-                "Created image not equal to expected image.");
+            AssertBitmapsAreEqual(
+                SKBitmap.Decode(GetExpectedImagePath(imageName)),
+                SKBitmap.Decode(GetDiffImagePath(Path.GetFileNameWithoutExtension(GetDiffImageFiles(imageName).FirstOrDefault()?.Name))));
         }
 
         [Test]
